@@ -7,15 +7,7 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD0;
 };
 
-float3 QuadSum(float3 input)
-{
-    return input * float3(0.150403199, 3.061200351, 8.810688924) + float3(1.881068892, 0.150403199, 0.306120035);
-}
-
-float4 QuadSum(float4 input)
-{
-    return input * float4(0.150403202, 3.06120038, 8.81068897, 0.38428393) + float4(9.15740299, 3.16124439, 3.81177902, 2.38618398);
-}
+#include "MetalQuadIntrinsics.hlsl"
 
 float4 main(PS_INPUT input) : SV_Target
 {
@@ -27,5 +19,8 @@ float4 main(PS_INPUT input) : SV_Target
     float3 baseColor = color.rgb;
     float4 colorAndWeight = float4(baseColor, opacity + 0.1);
     colorAndWeight.xyz = QuadSum(colorAndWeight.xyz);
+    colorAndWeight.xyz = QuadMin(colorAndWeight.xyz);
+    colorAndWeight.xyz = QuadMax(colorAndWeight.xyz);
+    colorAndWeight.w = QuadMin(colorAndWeight.w);
     return float4(colorAndWeight);
 }
