@@ -484,14 +484,28 @@ void ToMetal::CallHelper3(const char* name, Instruction* psInst,
 
     AddAssignToDest(&psInst->asOperands[dest], ui32Flags & TO_FLAG_FORCE_HALF ? SVT_FLOAT16 : SVT_FLOAT, dstSwizCount, psInst->ui32PreciseMask, numParenthesis);
 
-    bformata(glsl, "%s(", name);
-    numParenthesis++;
-    glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
-    bcatcstr(glsl, ", ");
-    glsl << TranslateOperand(&psInst->asOperands[src1], ui32Flags, destMask);
-    bcatcstr(glsl, ", ");
-    glsl << TranslateOperand(&psInst->asOperands[src2], ui32Flags, destMask);
-    AddAssignPrologue(numParenthesis);
+    std::string mulFactor = TranslateOperand(&psInst->asOperands[src1], ui32Flags, destMask);
+    std::string addFactor = TranslateOperand(&psInst->asOperands[src2], ui32Flags, destMask);
+    if ((mulFactor == "float3(0.150403199, 3.061200351, 8.810688924)" && addFactor == "float3(1.881068892, 0.150403199, 0.306120035)")
+        || (mulFactor == "float4(0.150403202, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
+        )
+    {
+        bformata(glsl, "%s(", "quad_sum");
+        numParenthesis++;
+        glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
+        AddAssignPrologue(numParenthesis);
+    }
+    else
+    {
+        bformata(glsl, "%s(", name);
+        numParenthesis++;
+        glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
+        bcatcstr(glsl, ", ");
+        glsl << mulFactor;
+        bcatcstr(glsl, ", ");
+        glsl << addFactor;
+        AddAssignPrologue(numParenthesis);
+    }
 }
 
 void ToMetal::CallHelper3(const char* name, Instruction* psInst,

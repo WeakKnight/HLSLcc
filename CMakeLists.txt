@@ -3,7 +3,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(HLSLcc)
 
-option(HLSLCC_LIBRARY_SHARED "Build shared library instead of static." ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${PROJECT_SOURCE_DIR}/Bin/Release>)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG $<1:${PROJECT_SOURCE_DIR}/Bin/Debug>)
+
+file(COPY ${CMAKE_SOURCE_DIR}/Assets
+    DESTINATION ${CMAKE_SOURCE_DIR}/Bin/Debug)
+
+file(COPY ${CMAKE_SOURCE_DIR}/Assets
+    DESTINATION ${CMAKE_SOURCE_DIR}/Bin/Release)
 
 file(GLOB HLSLCC_HDRS "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 set(HLSLCC_SRC
@@ -34,11 +41,7 @@ set(HLSLCC_SRC
 		src/cbstring/bstraux.c
 		src/cbstring/bstrlib.c)
 
-if(HLSLCC_LIBRARY_SHARED)
-	add_library(hlslcc SHARED ${HLSLCC_SRC})
-else(HLSLCC_LIBRARY_SHARED)
-	add_library(hlslcc STATIC ${HLSLCC_SRC})
-endif(HLSLCC_LIBRARY_SHARED)
+add_library(hlslcc STATIC ${HLSLCC_SRC})
 
 target_include_directories(hlslcc
     PUBLIC
@@ -49,16 +52,16 @@ target_include_directories(hlslcc
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/cbstring>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/internal_includes>)
+
 set_target_properties(hlslcc PROPERTIES
     "CXX_STANDARD" "11"
     "CXX_STANDARD_REQUIRED" "ON"
     "PUBLIC_HEADERS" "${HLSLCC_HDRS}")
-install(TARGETS hlslcc
-    EXPORT hlslccConfig
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    PUBLIC_HEADER DESTINATION include/hlslcc)
-install(FILES ${HLSLCC_HDRS} DESTINATION include/hlslcc)
-install(EXPORT hlslccConfig DESTINATION share/hlslcc/cmake)
-export(TARGETS hlslcc FILE hlslccConfig.cmake)
+
+add_executable(test main.cpp)
+target_link_libraries(test hlslcc)
+
+
+set_target_properties(test PROPERTIES
+    "CXX_STANDARD" "17"
+    "CXX_STANDARD_REQUIRED" "ON")
