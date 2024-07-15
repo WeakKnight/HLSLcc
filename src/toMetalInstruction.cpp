@@ -3256,9 +3256,9 @@ void ToMetal::TranslateInstruction(Instruction* psInst)
             else
             {
                 ASSERT(psInst->eBooleanTestType == INSTRUCTION_TEST_NONZERO);
-                bcatcstr(glsl, "if((");
-                glsl << TranslateOperand(&psInst->asOperands[0], TO_FLAG_INTEGER);
-                bcatcstr(glsl, ")!=0){discard_fragment();}\n");
+                bcatcstr(glsl, "if(");
+                glsl << TranslateOperand(&psInst->asOperands[0], TO_FLAG_BOOL);
+                bcatcstr(glsl, "){discard_fragment();}\n");
             }
             break;
         }
