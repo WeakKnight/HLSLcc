@@ -7,7 +7,9 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD0;
 };
 
-#include "MetalQuadIntrinsics.hlsl"
+#include "MetalQuadIntrinsic.hlsl"
+
+//! TODO: Try Div
 
 float4 main(PS_INPUT input) : SV_Target
 {
