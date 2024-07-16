@@ -20,7 +20,7 @@ float4 main(PS_INPUT input) : SV_Target
     float4 colorAndWeight = float4(baseColor, opacity + 0.1);
     colorAndWeight.xyz = QuadSum(colorAndWeight.xyz);
     colorAndWeight.xyz = QuadMin(colorAndWeight.xyz);
-    colorAndWeight.xyz = QuadMax(colorAndWeight.xyz);
+    colorAndWeight.xyz = 3.14159f * QuadMax(colorAndWeight.xyz) + 1.414f;
     colorAndWeight.w = QuadMin(colorAndWeight.w);
     return float4(colorAndWeight);
 }
