@@ -80,6 +80,7 @@ private:
     void AddAssignToDest(const Operand* psDest,
         SHADER_VARIABLE_TYPE eSrcType, uint32_t ui32SrcElementCount, uint32_t precise, int& numParenthesis);
     void AddAssignPrologue(int numParenthesis);
+    void AddAssignPrologueWithComments(int numParenthesis, const std::string comments);
 
     typedef enum
     {
@@ -110,6 +111,8 @@ private:
         int dest, int src0, int src1, int paramsShouldFollowWriteMask);
     void CallHelper2UInt(const char* name, Instruction* psInst,
         int dest, int src0, int src1, int paramsShouldFollowWriteMask);
+    void CallHelperSpecialMov(Instruction* psInst,
+        int dest, int src0, int paramsShouldFollowWriteMask);
     void CallHelper1(const char* name, Instruction* psInst,
         int dest, int src0, int paramsShouldFollowWriteMask);
     void CallHelper1Int(

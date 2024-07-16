@@ -9,8 +9,6 @@ struct PS_INPUT
 
 #include "MetalQuadIntrinsic.hlsl"
 
-//! TODO: Try Div
-
 float4 main(PS_INPUT input) : SV_Target
 {
     float4 color = Foo.Sample(Sampler, input.TexCoord);

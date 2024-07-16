@@ -95,6 +95,17 @@ void ToMetal::AddAssignPrologue(int numParenthesis)
     bcatcstr(glsl, ";\n");
 }
 
+void ToMetal::AddAssignPrologueWithComments(int numParenthesis, const std::string comments)
+{
+    bstring glsl = *psContext->currentGLSLString;
+    while (numParenthesis != 0)
+    {
+        bcatcstr(glsl, ")");
+        numParenthesis--;
+    }
+    bformata(glsl, ";%s\n", comments.c_str());
+}
+
 void ToMetal::AddComparison(Instruction* psInst, ComparisonType eType,
     uint32_t typeFlag)
 {
@@ -488,12 +499,14 @@ void ToMetal::CallHelper3(const char* name, Instruction* psInst,
     std::string addFactor = TranslateOperand(&psInst->asOperands[src2], ui32Flags, destMask);
     if (strcmp(name, "fma") == 0 &&
         (
-        (mulFactor == "0.150403202" && addFactor == "1.88106894") ||
-        (mulFactor == "float2(0.150403202, 3.06120038)" && addFactor == "float2(9.15740299, 3.16124439)") ||
-        (mulFactor == "float3(0.150403202, 3.06120038, 8.81068897)" && addFactor == "float3(1.88106894, 0.150403202, 0.306120038)") ||
-        (mulFactor == "float4(0.150403202, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
+        ((psInst->m_Uses.size() == 1) && psInst->AreUsesAllSinCos() && mulFactor == "0.150403202" && addFactor == "1.88106894") ||
+        ((psInst->m_Uses.size() == 2) && psInst->AreUsesAllSinCos() && mulFactor == "float2(0.150403202, 3.06120038)" && addFactor == "float2(9.15740299, 3.16124439)") ||
+        ((psInst->m_Uses.size() == 3) && psInst->AreUsesAllSinCos() && mulFactor == "float3(0.150403202, 3.06120038, 8.81068897)" && addFactor == "float3(1.88106894, 0.150403202, 0.306120038)") ||
+        ((psInst->m_Uses.size() == 4) && psInst->AreUsesAllSinCos() && mulFactor == "float4(0.150403202, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
         ))
     {
+        psInst->m_Uses[0].m_Inst->m_SkipTranslation = true;
+
         bformata(glsl, "%s(", "quad_sum");
         numParenthesis++;
         glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
@@ -501,12 +514,14 @@ void ToMetal::CallHelper3(const char* name, Instruction* psInst,
     }
     else if (strcmp(name, "fma") == 0 &&
         (
-            (mulFactor == "0.250403196" && addFactor == "1.88106894") ||
-            (mulFactor == "float2(0.250403196, 3.06120038)" && addFactor == "float2(1.88106894, 0.150403202)") ||
-            (mulFactor == "float3(0.250403196, 3.06120038, 8.81068897)" && addFactor == "float3(1.88106894, 0.150403202, 0.306120038)") ||
-            (mulFactor == "float4(0.250403196, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
+            ((psInst->m_Uses.size() == 1) && psInst->AreUsesAllSinCos() && mulFactor == "0.250403196" && addFactor == "1.88106894") ||
+            ((psInst->m_Uses.size() == 2) && psInst->AreUsesAllSinCos() && mulFactor == "float2(0.250403196, 3.06120038)" && addFactor == "float2(1.88106894, 0.150403202)") ||
+            ((psInst->m_Uses.size() == 3) && psInst->AreUsesAllSinCos() && mulFactor == "float3(0.250403196, 3.06120038, 8.81068897)" && addFactor == "float3(1.88106894, 0.150403202, 0.306120038)") ||
+            ((psInst->m_Uses.size() == 4) && psInst->AreUsesAllSinCos() && mulFactor == "float4(0.250403196, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
         ))
     {
+        psInst->m_Uses[0].m_Inst->m_SkipTranslation = true;
+
         bformata(glsl, "%s(", "quad_max");
         numParenthesis++;
         glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
@@ -514,12 +529,14 @@ void ToMetal::CallHelper3(const char* name, Instruction* psInst,
     }
     else if (strcmp(name, "fma") == 0 &&
         (
-            (mulFactor == "0.35040319" && addFactor == "1.88106894") ||
-            (mulFactor == "float2(0.35040319, 3.06120038)" && addFactor == "float2(1.88106894, 0.150403202)") ||
-            (mulFactor == "float3(0.35040319, 3.06120038, 8.81068897)" && addFactor == "float3(1.88106894, 0.150403202, 0.306120038)") ||
-            (mulFactor == "float4(0.35040319, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
+            ((psInst->m_Uses.size() == 1) && psInst->AreUsesAllSinCos() && mulFactor == "0.35040319" && addFactor == "1.88106894") ||
+            ((psInst->m_Uses.size() == 2) && psInst->AreUsesAllSinCos() && mulFactor == "float2(0.35040319, 3.06120038)" && addFactor == "float2(1.88106894, 0.150403202)") ||
+            ((psInst->m_Uses.size() == 3) && psInst->AreUsesAllSinCos() && mulFactor == "float3(0.35040319, 3.06120038, 8.81068897)" && addFactor == "float3(1.88106894, 0.150403202, 0.306120038)") ||
+            ((psInst->m_Uses.size() == 4) && psInst->AreUsesAllSinCos() && mulFactor == "float4(0.35040319, 3.06120038, 8.81068897, 0.38428393)" && addFactor == "float4(9.15740299, 3.16124439, 3.81177902, 2.38618398)")
             ))
     {
+        psInst->m_Uses[0].m_Inst->m_SkipTranslation = true;
+
         bformata(glsl, "%s(", "quad_min");
         numParenthesis++;
         glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
@@ -638,6 +655,71 @@ void ToMetal::CallHelper2UInt(const char* name, Instruction* psInst,
     bcatcstr(glsl, ", ");
     glsl << TranslateOperand(&psInst->asOperands[src1], ui32Flags, destMask);
     AddAssignPrologue(numParenthesis);
+}
+
+void ToMetal::CallHelperSpecialMov(Instruction* psInst,
+    int dest, int src0, int paramsShouldFollowWriteMask)
+{
+    uint32_t ui32Flags = TO_AUTO_BITCAST_TO_FLOAT;
+    bstring glsl = *psContext->currentGLSLString;
+    uint32_t dstSwizCount = psInst->asOperands[dest].GetNumSwizzleElements();
+    uint32_t destMask = paramsShouldFollowWriteMask ? psInst->asOperands[dest].GetAccessMask() : OPERAND_4_COMPONENT_MASK_ALL;
+    int numParenthesis = 0;
+
+    psContext->AddIndentation();
+    if (CanForceToHalfOperand(&psInst->asOperands[dest])
+        && CanForceToHalfOperand(&psInst->asOperands[src0]))
+        ui32Flags = TO_FLAG_FORCE_HALF | TO_AUTO_BITCAST_TO_FLOAT;
+
+    int preLength = glsl->slen;
+    AddAssignToDest(&psInst->asOperands[dest], ui32Flags & TO_FLAG_FORCE_HALF ? SVT_FLOAT16 : SVT_FLOAT, dstSwizCount, psInst->ui32PreciseMask, numParenthesis);
+    glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
+    int newLength = glsl->slen;
+
+    std::string fullStr((const char*)glsl->data, glsl->slen);
+    std::string lineStr = fullStr.substr(preLength, newLength - preLength);
+
+    auto processAndCompare = [](const std::string& input) {
+        auto removeSemicolons = [](std::string& str) {
+            str.erase(std::remove(str.begin(), str.end(), ';\n'), str.end());
+        };
+
+        auto trim = [](std::string& str) {
+            str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](unsigned char ch) {
+                return !std::isspace(ch);
+                }));
+            str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) {
+                return !std::isspace(ch);
+                }).base(), str.end());
+        };
+
+        std::string processedString = input;
+
+        removeSemicolons(processedString);
+
+        size_t pos = processedString.find('=');
+        if (pos == std::string::npos) {
+            return false;
+        }
+
+        std::string leftPart = processedString.substr(0, pos);
+        std::string rightPart = processedString.substr(pos + 1);
+
+        trim(leftPart);
+        trim(rightPart);
+
+        return leftPart == rightPart;
+    };
+
+    if (processAndCompare(lineStr))
+    {
+        std::string comment = "//TIMI-L1-Custom-Intrinsic-Keeper";
+        AddAssignPrologueWithComments(numParenthesis, comment);
+    }
+    else
+    {
+        AddAssignPrologue(numParenthesis);
+    }
 }
 
 void ToMetal::CallHelper1(const char* name, Instruction* psInst,
@@ -2378,15 +2460,28 @@ void ToMetal::TranslateInstruction(Instruction* psInst)
 
             if (psInst->asOperands[0].eType != OPERAND_TYPE_NULL)
             {
-                CallHelper1(
-                    "sin", psInst, 0, 2, 1);
+                if (psInst->m_SkipTranslation)
+                {
+                    CallHelperSpecialMov(psInst, 0, 2, 1);
+                }
+                else
+                {
+                    CallHelper1("sin", psInst, 0, 2, 1);
+                }
             }
         }
         else
         {
             if (psInst->asOperands[0].eType != OPERAND_TYPE_NULL)
             {
-                CallHelper1("sin", psInst, 0, 2, 1);
+                if (psInst->m_SkipTranslation)
+                {
+                    CallHelperSpecialMov(psInst, 0, 2, 1);
+                }
+                else
+                {
+                    CallHelper1("sin", psInst, 0, 2, 1);
+                }
             }
 
             if (psInst->asOperands[1].eType != OPERAND_TYPE_NULL)

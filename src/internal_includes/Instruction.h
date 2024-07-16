@@ -174,6 +174,20 @@ struct Instruction
         Operand*     m_Op;   // The operand within the instruction above. Note: can also be suboperand.
     };
 
+    bool AreUsesAllSinCos() const
+    {
+        bool allSinCos = true;
+        for (const auto& use : m_Uses)
+        {
+            if (use.m_Inst == nullptr || (use.m_Inst->eOpcode != OPCODE_SINCOS))
+            {
+                allSinCos = false;
+                break;
+            }
+        }
+        return allSinCos;
+    }
+
     std::vector<Use> m_Uses; // Array of use sites for the result(s) of this instruction, if any of the results is a temp reg.
 
     Instruction* m_LoopInductors[4]; // If OPCODE_LOOP and is suitable for transforming into for-loop, contains pointers to for initializer, end condition, breakc,  and increment.
