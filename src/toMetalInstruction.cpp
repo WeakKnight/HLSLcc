@@ -674,52 +674,7 @@ void ToMetal::CallHelperSpecialMov(Instruction* psInst,
     int preLength = glsl->slen;
     AddAssignToDest(&psInst->asOperands[dest], ui32Flags & TO_FLAG_FORCE_HALF ? SVT_FLOAT16 : SVT_FLOAT, dstSwizCount, psInst->ui32PreciseMask, numParenthesis);
     glsl << TranslateOperand(&psInst->asOperands[src0], ui32Flags, destMask);
-    int newLength = glsl->slen;
-
-    std::string fullStr((const char*)glsl->data, glsl->slen);
-    std::string lineStr = fullStr.substr(preLength, newLength - preLength);
-
-    auto processAndCompare = [](const std::string& input) {
-        auto removeSemicolons = [](std::string& str) {
-            str.erase(std::remove(str.begin(), str.end(), ';\n'), str.end());
-        };
-
-        auto trim = [](std::string& str) {
-            str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](unsigned char ch) {
-                return !std::isspace(ch);
-                }));
-            str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) {
-                return !std::isspace(ch);
-                }).base(), str.end());
-        };
-
-        std::string processedString = input;
-
-        removeSemicolons(processedString);
-
-        size_t pos = processedString.find('=');
-        if (pos == std::string::npos) {
-            return false;
-        }
-
-        std::string leftPart = processedString.substr(0, pos);
-        std::string rightPart = processedString.substr(pos + 1);
-
-        trim(leftPart);
-        trim(rightPart);
-
-        return leftPart == rightPart;
-    };
-
-    if (processAndCompare(lineStr))
-    {
-        std::string comment = "//TIMI-L1-Custom-Intrinsic-Keeper";
-        AddAssignPrologueWithComments(numParenthesis, comment);
-    }
-    else
-    {
-        AddAssignPrologue(numParenthesis);
-    }
+    AddAssignPrologue(numParenthesis);
 }
 
 void ToMetal::CallHelper1(const char* name, Instruction* psInst,
