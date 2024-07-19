@@ -2400,7 +2400,22 @@ void ToMetal::TranslateInstruction(Instruction* psInst)
         if (psContext->flags & HLSLCC_FLAG_INCLUDE_INSTRUCTIONS_COMMENTS)
         {
             psContext->AddIndentation();
-            bcatcstr(glsl, "//SINCOS\n");
+            bool isCustomIntrinsic = false;
+            if(psInst->asOperands[0].eType != OPERAND_TYPE_NULL)
+            {
+                if (psInst->m_SkipTranslation)
+                {
+                    isCustomIntrinsic = true;
+                }
+            }
+            if (isCustomIntrinsic)
+            {
+                bcatcstr(glsl, "//Custom Intrinsic\n");
+            }
+            else
+            {
+                bcatcstr(glsl, "//SINCOS\n");
+            }
         }
         // Need careful ordering if src == dest[0], as then the cos() will be reading from wrong value
         if (psInst->asOperands[0].eType == psInst->asOperands[2].eType &&
